@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div align="center",paddint->
+	<img src="{{ product.image }}">
+	<p>You can buy {{ product.title }} just for few clicks! Only {{ product.price }}$</p><hr>
+	{% if product.status == 'a' %}
+	<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buy now!</button>
+	<p color=green> Availabile!</p>
+	{% else %}
+	<button class="btn btn-outline-error my-2 my-sm-0" type="submit" disabled>Buy now!</button>
+	<p>Unfortanally unavailable for now :(</p>
+	{% endif %}
+	<div align=left>
+	<h3>Description</h3></br>
+	<p>{{ product.description }}</p><hr>
+	<strong>Categories: </strong>
+	{% for category in product.category.all %}
+	{{ category }}
+	{% endfor %}
+	</div>
+</div>
+
+{% endblock %}
