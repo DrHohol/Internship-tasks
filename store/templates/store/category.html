@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href= "{% static 'css/styles.css' %}", type="text/css">
+<div class="mainpage">
+<div class="main">
+{% for product in category.product_set.all %}
+<div class="news_block"><img class="news" src="{{ product.image }}"><p class="statta"><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></p></div>
+{% endfor %}
+
+{% endblock %}

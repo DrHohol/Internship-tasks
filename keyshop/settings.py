@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'store.apps.StoreConfig',
+    'account.apps.AccountConfig',
+    'cart.apps.CartConfig',
 ]
 
 MIDDLEWARE = [
@@ -130,8 +132,12 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 VENV_PATH = os.path.dirname(BASE_DIR)
 STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
 
+MEDIA_URL = '/media/'
+MEDIAFILES_DIRS = [os.path.join(BASE_DIR,'product_picture')]
+MEDIA_ROOT = os.path.join(VENV_PATH,'media_root')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CART_SESSION_ID = 'cart'

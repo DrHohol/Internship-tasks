@@ -30,20 +30,14 @@
     font-weight: bold;
 }
 </style>
-</head>
-<body>
 <div class="login-form">
     {% if form.errors %}
   <p>Your username and password didn't match. Please try again.</p>
     {% endif %}
-    {% if next %}
   {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-  {% else %}
-    <p>Please login to see this page.</p>
-  {% endif %}
-{% endif %}
+    <p>You already logged in. You you want to login to another account, please log out firstly</p>
+    {% else %}
+    
     <form action="{% url 'login' %}" method="post" >
         {% csrf_token %}
         <h2 class="text-center">Log in</h2>       
@@ -58,6 +52,8 @@
         </div>
                
     </form>
-    <p class="text-center"><a href="#">Create an Account</a></p>
+</div>
+    <p class="text-center"><a href="{% url 'register' %}">Create an Account</a></p>
+    {% endif %}
 
 {% endblock %}

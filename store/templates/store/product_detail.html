@@ -11,12 +11,15 @@
 	<button class="btn btn-outline-error my-2 my-sm-0" type="submit" disabled>Buy now!</button>
 	<p>Unfortanally unavailable for now :(</p>
 	{% endif %}
+	{% if user.is_authenticated %}
+		<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Add to Wishlist!</button>
+	{% endif %}
 	<div align=left>
 	<h3>Description</h3></br>
 	<p>{{ product.description }}</p><hr>
 	<strong>Categories: </strong>
 	{% for category in product.category.all %}
-	{{ category }}
+		{{ category }}
 	{% endfor %}
 	</div>
 </div>

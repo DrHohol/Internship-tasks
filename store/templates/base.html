@@ -31,7 +31,7 @@
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           {% for category in category_list %}
-        <a class="dropdown-item"href="{{ author.get_absolute_url }}">{{ category }} </a>
+        <a class="dropdown-item"href="#">{{ category }} </a>
       </li>
       {% endfor %}
           <a class="dropdown-item" href="#">Action</a>
@@ -45,11 +45,14 @@
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
-      {% if user.is_authenticated %}
-      <a href="{% url 'login' %}">Log In</button></a>
+      {% if not user.is_authenticated %}
+      <a href="{% url 'register' %}">Register</a>
+      <a style="padding-left: 20px" href="{% url 'login' %}">Log In</a>
       {% else %}
-      {{ user.get_username }}
-      <a href="{% url 'logout' %}">Log out</button></a>
+
+      You are logged as {{ user.get_username }}
+      <a style="padding-left: 20px" href="{% url 'wishlist' %}">Wishlist</a>
+      <a style="padding-left: 20px" class="register_form" href="{% url 'logout' %}">Log out</button></a>
       {% endif %}
     </form>
   </div>

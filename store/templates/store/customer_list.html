@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>My Wishlist</h1>
+{% for product in customer.wishlist.all %}
+
+<p>{{ product }}</p>
+
+{% endfor %}
+{% endblock %}
