@@ -4,7 +4,7 @@
     <h1>My Wishlist</h1>
 {% for product in customer.wishlist.all %}
 
-<p>{{ product }}</p>
+<a href="{{ product.get_absolute_url }}"><p>{{ product }}</p></a>
 
 {% endfor %}
 {% endblock %}

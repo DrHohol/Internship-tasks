@@ -3,6 +3,7 @@ from django.urls import reverse #Used to generate URLs by reversing the URL patt
 import uuid
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.utils.text import slugify
 
 class Category(models.Model):
 
@@ -14,9 +15,7 @@ class Category(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        """
-        Returns the url to access a particular book instance.
-        """
+ 
         return reverse('category', kwargs={'Category_slug':self.slug})
 
 class Product(models.Model):
@@ -30,6 +29,7 @@ class Product(models.Model):
         ('n','not available'))
     status = models.CharField(max_length=1, choices=availability, blank=True, default='a', help_text='Key availability')
     price = models.FloatField(help_text='Product price',default=0)
+    InStock = models.PositiveSmallIntegerField(default=1)
 
     def __str__(self):
 
@@ -37,15 +37,10 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         """
-        Returns the url to access a particular book instance.
+        Returns the url to access a product
         """
         return reverse('product', args=[str(self.id)])
 
-    def display_category(self):
-
-        return ','.join([category.name for category in self.category.all()[:3]])
-
-    display_category.short_description = 'Category'
 
 class KeyInstance(models.Model):
 
@@ -66,6 +61,9 @@ class Customer(models.Model):
     def __str__(self):
         
         return f"{self.user.username}"
+
+
+
 '''
 class Wishlist(models.Model):
 
