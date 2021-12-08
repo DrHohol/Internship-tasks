@@ -1,3 +1,2 @@
-# Internship-tasks
+# Didgital products store
 
-Didgital products store
