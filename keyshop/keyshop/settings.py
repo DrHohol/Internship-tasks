@@ -20,11 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = "django-insecure-5l(=50c2k1pxwh%f%*d)+q2s&gp$&c)(h(7s-*g!nhs4r5ef@+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = Tint(os.environ.get("DEBUG", default=0))
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+DEBUG = 1
+ALLOWED_HOSTS = []
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -131,9 +131,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 VENV_PATH = os.path.dirname(BASE_DIR)
 STATIC_ROOT = os.path.join(VENV_PATH, 'static_root')
 
-MEDIA_URL = '/media/'
-MEDIAFILES_DIRS = [os.path.join(BASE_DIR,'product_picture')]
-MEDIA_ROOT = os.path.join(VENV_PATH,'media_root')
+#MEDIA_URL = '/media/'
+#MEDIAFILES_DIRS = [os.path.join(BASE_DIR,'product_picture')]
+#MEDIA_ROOT = os.path.join(VENV_PATH,'media_root')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
