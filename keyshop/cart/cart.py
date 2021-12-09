@@ -35,7 +35,7 @@ class Cart(object):
 
     def remove(self, product):
         """
-        Удаление товара из корзины.
+        Delete product from cart
         """
         product_id = str(product.id)
         if product_id in self.cart:
