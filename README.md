@@ -1,2 +1,2 @@
-# Didgital products store
+# Platform for interview on flask
 
