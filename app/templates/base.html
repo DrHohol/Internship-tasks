@@ -6,7 +6,26 @@
 	<title>{{ title }}</title>
 </head>
 <body>
+<a href="{{ url_for('create_interview') }}">Create Interview</a>
+{% if current_user.is_authenticated %}
+<a href="{{ url_for('logout') }}" style="padding-left: 10px;">Logout</a>
+<a href="{{ url_for('interviews') }}" style="padding-left:10px;">My Interviews</a>
+<a href="{{ url_for('create_question') }}" style="padding-left:10px;">Add question</a>
 
+{% else %}
+<a href="{{ url_for('login') }}" style="padding-left:10px;">Login</a>
+{% endif %}
+ </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
 {% block content %}
 
 {% endblock %}

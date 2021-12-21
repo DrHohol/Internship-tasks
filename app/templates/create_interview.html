@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="" method="post" novalidate>
+	{{ form.hidden_tag() }}
+
+	<p>{{ form.interview_title.label }}</p>
+	{{ form.interview_title() }} <br>
+
+	<p> {{ form.candidat_name.label }} </p>
+	{{ form.candidat_name }}
+	<p> {{ form.recrutier.label }} </p>
+	{{ form.recrutier }} <br>
+	<p>{{ form.experts.label }}</p>
+	<p>{{ form.experts }}</p>
+
+	<p>{{ form.questions }}</p>
+	<p>Zoom Link</p>
+	<p>{{ form.zoom }}</p>
+
+	{{ form.create }}
+
+</form>
+
+{% endblock %}

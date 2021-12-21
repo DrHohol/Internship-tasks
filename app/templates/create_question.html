@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post", novalidate>
+	{{ form.hidden_tag() }}
+	<p>{{ form.question.label }}</p>
+	<p>{{ form.question }}</p>
+	{% for error in form.question.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	<p>Maximum grade for question</p>
+	<p>{{ form.max_grade }}</p>
+	{% for error in form.max_grade.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+	<p>{{ form.category }}</p>
+	<p>{{ form.create }}</p>
+
+</form>
+
+{% endblock %}

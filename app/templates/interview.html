@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{{ interview }}
+{% for q in interview.question %}
+<p>{{ q }}</p>
+{% endfor %}
+
+{% endblock %}

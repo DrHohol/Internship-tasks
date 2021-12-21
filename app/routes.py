@@ -1,8 +1,8 @@
-from app import app
+from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
-from app.forms import LoginForm
-from app.models import User
+from app.forms import *
+from app.models import User, Questions, Interview, Category
 from flask_login import current_user, login_user, logout_user, login_required
 
 @app.route('/')
@@ -21,7 +21,7 @@ def interviews():
 @app.route('/login',methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
-        redirect(url_parse('index'))
+        redirect(url_for('index'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -38,3 +38,66 @@ def login():
         return redirect(next_page)
     
     return render_template('login.html',title='Sign In',form=form)
+
+
+@app.route('/create-interview',methods=['GET','POST'])
+@login_required
+def create_interview():
+    
+    form = InterviewCreationForm()
+    ''' add choices to select fields '''
+    form.recrutier.choices = [recrutier.username for recrutier in User.query.filter_by(role=2).all()]
+    form.experts.choices = [(expert.id, expert.username) for expert in User.query.filter_by(role=1).all()]
+    form.questions.choices = [(question.id, question.question) for question in Questions.query.all()]
+    if form.validate_on_submit():
+
+        ''' create list of questions '''
+        qlist = []
+        for i in form.questions.data:
+            question = Questions.query.filter_by(id=i).first()
+            qlist.append(question)
+
+        ''' creating list of experts '''
+        elist = []
+        for expert in form.experts.data:
+            exp = User.query.filter_by(id=expert).first()
+            elist.append(exp)
+
+        inter = Interview(title=form.interview_title.data,candidat=form.candidat_name.data,
+            recrutier=form.recrutier.data, question=qlist, interviewer=elist) #
+        db.session.add(inter)
+        db.session.commit()
+        flash('Interview created successfuly')
+    else:
+        print(form.errors)
+
+    return render_template('create_interview.html',form=form )
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@app.route('/create-question',methods=['GET',"POST"])
+@login_required
+def create_question():
+
+    form = QuestionCreateForm()
+    form.category.choices = [(category.id, category.name) for category in Category.query.all()]
+    if form.validate_on_submit():
+        new_question = Questions(question=form.question.data,max_grade=form.max_grade.data)
+
+        db.session.add(new_question)
+        db.session.commit()
+        flash('Question created successfuly')
+
+    return render_template('create_question.html',form=form)
+
+
+@app.route('/interview/<interview_id>')
+def interview(interview_id):
+
+    interview = Interview.query.filter_by(id=interview_id).first()
+    return render_template('interview.html',title="interview",interview=interview)
