@@ -16,3 +16,5 @@ psycopg2-binary==2.9.2
 SQLAlchemy==1.4.28
 Werkzeug==2.0.2
 WTForms==3.0.0
+pyOpenSSL=21.0.0
+secrets=1.0.2

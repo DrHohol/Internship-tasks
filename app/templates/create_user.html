@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if current_user.role != 0 %}
+<h2>Only admins can access to this page</h2>
+{% else %}
+<form method="post">
+	{{ form.hidden_tag() }}
+	<p>Username</p>
+	<p>{{ form.username}}</p>
+	{% for error in form.username.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+	<p>Role(0 - admin, 1 - recrutier, 2 - expert)</p>
+	<p>{{ form.role }}</p>
+	{% for error in form.role.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+	<p>First name</p>
+	<p>{{ form.firstname }}</p>
+	{% for error in form.firstname.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+	<p>Last name</p>
+	<p> {{ form.lastname}} </p>
+	{% for error in form.lastname.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+	<p> {{ form.create }} </p>
+</form>
+{% endif %}
+
+{% endblock %}

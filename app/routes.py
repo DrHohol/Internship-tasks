@@ -4,6 +4,7 @@ from werkzeug.urls import url_parse
 from app.forms import *
 from app.models import User, Questions, Interview, Category
 from flask_login import current_user, login_user, logout_user, login_required
+import secrets
 
 @app.route('/')
 def index():
@@ -101,3 +102,35 @@ def interview(interview_id):
 
     interview = Interview.query.filter_by(id=interview_id).first()
     return render_template('interview.html',title="interview",interview=interview)
+
+@app.route('/set-password',methods=['GET','POST'])
+def set_password():
+    pkey = request.args.get('key')
+    print(pkey)
+    if pkey == None:
+        redirect(url_for('index'))
+    form = SetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(private_key=pkey).first()
+        if user == None:
+            flash('key does not exist')
+        user.set_password(form.password.data)
+        user.private_key = secrets.token_urlsafe(16)
+        db.session.add(user)
+        db.session.commit()
+
+    return render_template('set_password.html',form=form)
+
+
+@app.route('/create-user',methods=['GET','POST'])
+@login_required
+def create_user():
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data,first_name=form.firstname.data,last_name=form.lastname.data,
+                    private_key=secrets.token_urlsafe(16),role=form.role.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('User created successfuly!')
+
+    return render_template('create_user.html',title='Create new user',form=form)

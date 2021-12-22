@@ -24,6 +24,7 @@ category_ident = db.Table('category_ident',
 
 class User(db.Model,UserMixin):
     '''Table for user'''
+    private_key = db.Column(db.String(24),unique=True)
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(64),index=True,unique=True)
     first_name = db.Column(db.String(64))
@@ -73,12 +74,29 @@ class Questions(db.Model):
 
         return f'{self.question}'
 
+class Grades(db.Model):
 
+    id = db.Column(db.Integer,primary_key=True)
+    question_id = db.Column(db.Integer,db.ForeignKey('questions.id'))
+    question = db.relationship('Questions',backref='grades')
+    interviewer_id = db.Column(db.Integer,db.ForeignKey('user.id'))
+    interviewer = db.relationship('User',backref='grades')
+    interview_id = db.Column(db.Integer,db.ForeignKey('interview.id'))
+    interview = db.relationship('Interview',backref='grades')
+    grade = db.Column(db.Integer)
+
+    def __repr__(self):
+
+        return f'{self.interviewer} rated question \"{self.question}\" {self.grade}'
 
 class Category(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
+
+    def __repr__(self):
+
+        return self.name
 
 
 admin.add_view(ModelView(User, db.session))
