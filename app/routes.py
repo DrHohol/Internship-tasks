@@ -22,7 +22,7 @@ def interviews():
 @app.route('/login',methods=['GET','POST'])
 def login():
     if current_user.is_authenticated:
-        redirect(url_for('index'))
+        return redirect(url_for('index'))
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -97,11 +97,15 @@ def create_question():
 
     return render_template('create_question.html',form=form)
 
-
+@login_required
 @app.route('/interview/<interview_id>',methods=['GET','POST'])
 def interview(interview_id):
 
     interview = Interview.query.filter_by(id=interview_id).first()
+    if current_user not in interview.interviewer and current_user not in [interview.recrutier]:
+
+        return redirect(url_for('index'),code=302)
+
     form = GradeInterviewForm()
   # form.questions = [question for question in Questions.query.all() if question.interviews.id == interview.id]
     print(interview.question)
@@ -137,7 +141,7 @@ def interview(interview_id):
         final_grade = totalgot/totalmax/(len(interview.interviewer)+1)*100
         print(final_grade)
         interview.final_grade = final_grade
-        #db.session.commit()
+        db.session.commit()
     else:
         print(form.errors)
 

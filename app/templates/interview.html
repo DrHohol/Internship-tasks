@@ -7,7 +7,7 @@
 {% for q in interview.question %}
 <p>{{q}}</p>
 {% endfor %}
-<h3 align="right">Total grade for this moment: {{ interview.final_grade }}</h3>
+<h3 align="right">Total grade for this moment: {{ interview.final_grade }}/100</h3>
 <h3>Choose and grade question:</h3>
 <form method='post'> 
 {{ form.hidden_tag() }}
