@@ -2,7 +2,7 @@ from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app.forms import *
-from app.models import User, Questions, Interview, Category
+from app.models import User, Questions, Interview, Category, Grades
 from flask_login import current_user, login_user, logout_user, login_required
 import secrets
 
@@ -13,7 +13,7 @@ def index():
 
 
 
-@app.route('/my-interviews')
+@app.route('/my-interviews',)
 @login_required
 def interviews():
 
@@ -65,7 +65,8 @@ def create_interview():
             elist.append(exp)
 
         inter = Interview(title=form.interview_title.data,candidat=form.candidat_name.data,
-            recrutier=form.recrutier.data, question=qlist, interviewer=elist) #
+            recrutier=form.recrutier.data, question=qlist, interviewer=elist,zoom_link=form.zoom.data,
+            date=form.date.data,time=form.time.data) #
         db.session.add(inter)
         db.session.commit()
         flash('Interview created successfuly')
@@ -97,11 +98,51 @@ def create_question():
     return render_template('create_question.html',form=form)
 
 
-@app.route('/interview/<interview_id>')
+@app.route('/interview/<interview_id>',methods=['GET','POST'])
 def interview(interview_id):
 
     interview = Interview.query.filter_by(id=interview_id).first()
-    return render_template('interview.html',title="interview",interview=interview)
+    form = GradeInterviewForm()
+  # form.questions = [question for question in Questions.query.all() if question.interviews.id == interview.id]
+    print(interview.question)
+    for q in interview.question:
+        try:
+            form.question.choices.append((q.id,q.question))
+        except AttributeError as e:
+            print(e)
+            pass
+
+    if form.validate_on_submit():
+        quest = Questions.query.filter_by(id=form.question.data).first()
+        grade = Grades.query.filter_by(interview_id=interview_id).filter_by(interviewer_id=current_user.id).filter_by(question_id=quest.id).first()
+        print(grade)
+        if grade is not None:
+            grade = form.grade.data
+            print(f'New grade is: {grade}')
+        else:
+            grade = Grades(question=quest,interview=interview,grade=form.grade.data,interviewer=current_user)
+            db.session.add(grade)
+
+        totalmax = 0
+        totalgot = 0
+        for question in interview.question:
+            try:
+                totalmax += question.max_grade
+                totalgot += question.grade
+            except:
+                pass
+        for grade in interview.grades:
+            totalgot += grade.grade
+        print(f'total {totalgot} \n max: {totalmax}')
+        final_grade = totalgot/totalmax/(len(interview.interviewer)+1)*100
+        print(final_grade)
+        interview.final_grade = final_grade
+        #db.session.commit()
+    else:
+        print(form.errors)
+
+
+    return render_template('interview.html',title="interview",interview=interview,form=form)
 
 @app.route('/set-password',methods=['GET','POST'])
 def set_password():

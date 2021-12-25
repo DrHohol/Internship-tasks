@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, SelectMultipleField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, SelectMultipleField, IntegerField, DateField, TimeField
 from wtforms.validators import DataRequired, NumberRange, EqualTo, ValidationError
-from app.models import User
+from app.models import User, Questions
 
 class LoginForm(FlaskForm):
     username = StringField('Username',validators=[DataRequired()])
@@ -17,7 +17,8 @@ class InterviewCreationForm(FlaskForm):
     experts = SelectMultipleField('experts',choices=[],validators=[DataRequired()],coerce=int)
     questions = SelectMultipleField('questions',choices=[],validators=[DataRequired()],coerce=int)
     zoom = StringField('zoom')
-    
+    date = DateField('Date of interview')
+    time = TimeField('Time of interview')
     create = SubmitField('Create')
 
 class QuestionCreateForm(FlaskForm):
@@ -31,13 +32,25 @@ class QuestionCreateForm(FlaskForm):
 
 class GradeInterviewForm(FlaskForm):
 
-    def __init__(self,max_grade):
+    ''' Validate max grade for each question'''
+    def max_grade(question,grade):
+
+        max_grade = Questions.query.filter_by(id=question.data.get('question')).first().max_grade
+        if grade.data > max_grade:
+            raise ValidationError('Grade bigger that maximum for this question')
+
+    question = SelectField('question',choices=[], validators=[DataRequired()])
+    grade = IntegerField('grade',validators=[DataRequired(),NumberRange(min=0),max_grade])
+    sumbit = SubmitField('Sumbit')
+
+
+'''
+    def __init__(self,questions):
         super().__init__(*args, **kwargs)
         max_grade=self.max_grade
         self.gradeform = self.GradeForm()
-
-    def GradeForm(self):
-        grade = IntegerField('Grade',validators=[NumberRange(max=self.max_grade)])
+       # def GradeForm(self):
+ '''
 
 class CreateUserForm(FlaskForm):
     '''Form for create new user (only for admin)'''
