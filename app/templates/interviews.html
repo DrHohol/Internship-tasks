@@ -4,7 +4,7 @@
 
 <h2 align='center'>Your interviews</h2>
 	{% for interview in current_user.interview %}
-	<a href="{{ url_for('interview',interview_id=interview.id) }}">{{ interview }}</a>
+	<p><a href="{{ url_for('interview',interview_id=interview.id) }}">{{ interview }}</a></p>
 	{% endfor %}
 
 {% endblock %}

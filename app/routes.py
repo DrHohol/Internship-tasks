@@ -1,16 +1,32 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from werkzeug.urls import url_parse
 from app.forms import *
 from app.models import User, Questions, Interview, Category, Grades
 from flask_login import current_user, login_user, logout_user, login_required
 import secrets
+from app.schema import *
+from app.utils import valid_key, get_final_grade
+
+'''
+Accept:application/json
+if request.headers.get('Accept') == 'application/json':
+    #{'experts':[recrutier.username for recrutier in User.query.filter_by(role=1).all()]}
+
+    key = request.headers.get('x-api-key')
+    if valid_key(key):
+        users = User.query.filter_by(private_key=key ).first()
+        print(users)
+        user_schema = UserSchema()
+        return jsonify(user_schema.dump(users))
+    else:
+        return jsonify({'Error':'Key does not exist'})
+'''
 
 @app.route('/')
 def index():
 
     return render_template('index.html',title='WELCOME')
-
 
 
 @app.route('/my-interviews',)
@@ -44,6 +60,7 @@ def login():
 @app.route('/create-interview',methods=['GET','POST'])
 @login_required
 def create_interview():
+
     
     form = InterviewCreationForm()
     ''' add choices to select fields '''
@@ -127,20 +144,8 @@ def interview(interview_id):
             grade = Grades(question=quest,interview=interview,grade=form.grade.data,interviewer=current_user)
             db.session.add(grade)
 
-        totalmax = 0
-        totalgot = 0
-        for question in interview.question:
-            try:
-                totalmax += question.max_grade
-                totalgot += question.grade
-            except:
-                pass
-        for grade in interview.grades:
-            totalgot += grade.grade
-        print(f'total {totalgot} \n max: {totalmax}')
-        final_grade = totalgot/totalmax/(len(interview.interviewer)+1)*100
-        print(final_grade)
-        interview.final_grade = final_grade
+       
+        interview.final_grade = get_final_grade(interview)
         db.session.commit()
     else:
         print(form.errors)
