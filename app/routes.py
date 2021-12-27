@@ -82,8 +82,9 @@ def create_interview():
             elist.append(exp)
 
         inter = Interview(title=form.interview_title.data,candidat=form.candidat_name.data,
-            recrutier=form.recrutier.data, question=qlist, interviewer=elist,zoom_link=form.zoom.data,
-            date=form.date.data,time=form.time.data) #
+                        recrutier=User.query.filter_by(username=form.recrutier.data).first(),
+                        question=qlist, interviewer=elist,zoom_link=form.zoom.data,
+                        date=form.date.data,time=form.time.data)
         db.session.add(inter)
         db.session.commit()
         flash('Interview created successfuly')
@@ -138,11 +139,11 @@ def interview(interview_id):
         grade = Grades.query.filter_by(interview_id=interview_id).filter_by(interviewer_id=current_user.id).filter_by(question_id=quest.id).first()
         print(grade)
         if grade is not None:
-            grade = form.grade.data
+            grade.grade = form.grade.data
             print(f'New grade is: {grade}')
         else:
             grade = Grades(question=quest,interview=interview,grade=form.grade.data,interviewer=current_user)
-            db.session.add(grade)
+        db.session.add(grade)
 
        
         interview.final_grade = get_final_grade(interview)

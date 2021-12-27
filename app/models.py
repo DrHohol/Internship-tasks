@@ -46,7 +46,8 @@ class Interview(db.Model):
 
     id = db.Column(db.Integer,primary_key=True) 
     title = db.Column(db.String(64))
-    recrutier = db.Column(db.String(64), db.ForeignKey('user.username'))
+    recrutier = db.relationship('User')
+    recrutier_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     
     question = db.relationship('Questions',backref=db.backref('interviews',lazy=True),
                                 lazy='subquery',secondary=question_indef)
@@ -81,7 +82,7 @@ class Grades(db.Model):
 
     id = db.Column(db.Integer,primary_key=True)
     question_id = db.Column(db.Integer,db.ForeignKey('questions.id'))
-    question = db.relationship('Questions',backref='grades',cascade='all, delete')
+    question = db.relationship('Questions',backref='grades',cascade='all,')
     interviewer_id = db.Column(db.Integer,db.ForeignKey('user.id'))
     interviewer = db.relationship('User',backref='grades',cascade='all, delete')
     interview_id = db.Column(db.Integer,db.ForeignKey('interview.id'))

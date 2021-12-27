@@ -42,3 +42,5 @@ class GradeSchema(ma.SQLAlchemyAutoSchema):
 		include_relationship = True
 		load_instance = True
 		exclude = ['id']
+	
+	question = fields.Nested('QuestionSchema',exclude=['grade'])
