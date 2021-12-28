@@ -7,6 +7,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 import secrets
 from app.schema import *
 from app.utils import get_final_grade
+from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers.response import Response
 
 '''
 Accept:application/json
@@ -33,7 +35,9 @@ def index():
 @login_required
 def interviews():
 
-    return render_template('interviews.html',title='My Interviews')
+    interviews = Interview.query.all()
+
+    return render_template('interviews.html',title='My Interviews',interviews=interviews)
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -157,18 +161,21 @@ def interview(interview_id):
 @app.route('/set-password',methods=['GET','POST'])
 def set_password():
     pkey = request.args.get('key')
-    print(pkey)
-    if pkey == None:
+
+    if not pkey:
         redirect(url_for('index'))
+    user = User.query.filter_by(private_key=pkey).first()
+    if not user:
+        raise HTTPException(response=Response("Invalid key", status=403))
+
     form = SetPasswordForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(private_key=pkey).first()
-        if user == None:
-            flash('key does not exist')
+
         user.set_password(form.password.data)
         user.private_key = secrets.token_urlsafe(16)
         db.session.add(user)
         db.session.commit()
+        flash('Password ')
 
     return render_template('set_password.html',form=form)
 

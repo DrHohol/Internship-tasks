@@ -3,6 +3,14 @@
 {% block content %}
 
 <h2 align='center'>Your interviews</h2>
+	{% if current_user.role == 2 %}
+
+	{% for interview in interviews %}
+	{% if interview.recrutier == current_user %}
+	<p><a href="{{ url_for('interview',interview_id=interview.id) }}">{{ interview }}</a></p>
+	{% endif %}
+	{% endfor %}
+	{% endif %}
 	{% for interview in current_user.interview %}
 	<p><a href="{{ url_for('interview',interview_id=interview.id) }}">{{ interview }}</a></p>
 	{% endfor %}

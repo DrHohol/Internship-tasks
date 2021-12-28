@@ -24,7 +24,7 @@ db.create_all()
 
 root_user = models.User.query.filter_by(role=0).first()
 if not root_user:
-	root_user = models.User(username=admin,role=0,private_key=secrets.token_urlsafe(16))
+	root_user = models.User(username='admin',role=0,private_key=secrets.token_urlsafe(16))
 	db.session.add(root_user)
 	root_user.set_password('password')
 	db.session.commit()

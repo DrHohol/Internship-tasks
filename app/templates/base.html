@@ -26,11 +26,13 @@
       <li class="nav-item active">
         <a class="nav-link" href="{{ url_for('create_question') }}">Create question</a>
       </li>
-      
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
+
+      {% if current_user.role == 0 %}
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('create_user') }}">Create user</a>
       </li>
-    </ul>
+      {% endif %}
+         </ul>
     <form class="form-inline my-2 my-lg-0">
       <a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
       {% else %}
