@@ -12,7 +12,6 @@ import secrets
 app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
-db.create_all()
 migrate = Migrate(app,db)
 login = LoginManager(app)
 login.login_view = 'login'
@@ -21,10 +20,11 @@ api = Api(app)
 ma = Marshmallow(app)
 
 from app import routes, models, api_routes
+db.create_all()
 
 root_user = models.User.query.filter_by(role=0).first()
 if not root_user:
-	root_user = User(username=admin,role=0,private_key=secrets.token_urlsafe(16))
+	root_user = models.User(username=admin,role=0,private_key=secrets.token_urlsafe(16))
 	root_user.set_password('password')
 
 class AdminModelView(ModelView):
