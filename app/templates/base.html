@@ -4,17 +4,42 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{{ title }}</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 </head>
 <body>
-<a href="{{ url_for('create_interview') }}">Create Interview</a>
-{% if current_user.is_authenticated %}
-<a href="{{ url_for('logout') }}" style="padding-left: 10px;">Logout</a>
-<a href="{{ url_for('interviews') }}" style="padding-left:10px;">My Interviews</a>
-<a href="{{ url_for('create_question') }}" style="padding-left:10px;">Add question</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+	{% if current_user.is_authenticated %}
+  <a class="navbar-brand" href="{{ url_for('interviews') }}">{{ current_user.username }}</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-{% else %}
-<a href="{{ url_for('login') }}" style="padding-left:10px;">Login</a>
-{% endif %}
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('interviews') }}">My interviews</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('create_interview') }}">Create interview</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="{{ url_for('create_question') }}">Create question</a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <a class="nav-link" href="{{ url_for('logout')}}">Logout</a>
+      {% else %}
+      <a class="nav-link" href="{{ url_for('login')}}">Login</a>
+      {% endif %}
+    </form>
+  </div>
+</nav>
+
  </div>
         <hr>
         {% with messages = get_flashed_messages() %}

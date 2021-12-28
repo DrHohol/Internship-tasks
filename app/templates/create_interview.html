@@ -2,26 +2,52 @@
 
 {% block content %}
 
-<form action="" method="post" novalidate>
+<form action="" method="post" novalidate style="pgl">
 	{{ form.hidden_tag() }}
 
-	<p>{{ form.interview_title.label }}</p>
-	{{ form.interview_title() }} <br>
+	Interview Title
+	<p>{{ form.interview_title() }}
+	{% for error in form.interview_title.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}</p>
 
-	<p> {{ form.candidat_name.label }} </p>
-	{{ form.candidat_name }}
-	<p> {{ form.recrutier.label }} </p>
-	{{ form.recrutier }} <br>
-	<p>{{ form.experts.label }}</p>
-	<p>{{ form.experts }}</p>
+	<br>Candidat 
+	<p>{{ form.candidat_name }}
+	{% for error in form.candidat_name.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}</p>
 
-	<p>{{ form.questions }}</p>
+	{{ form.recrutier.label }} </br>
+	<p>{{ form.recrutier }}
+	{% for error in form.recrutier.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}</p>
+
+	{{ form.experts.label }}
+	<p>{{ form.experts }}
+	{% for error in form.experts.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}</p>
+
+
+	<p>{{ form.questions }}
+	{% for error in form.questions.errors %}
+            <span style="color: red;">{{ error }}</span>
+            {% endfor %}</p>
+
 	<p>Zoom Link</p>
 	<p>{{ form.zoom }}</p>
-	<p>Date</p>
+	<p>Date and time</p>
 	{{ form.date }}
- 	{{ form.time }}
-	<p>{{ form.create }}</p>
+	{{ form.time }}
+	<p class="badge badge-pill badge-primary">{{ form.create }}</p>
+
+	{% for error in form.date.errors %}
+            <p><span style="color: red;">{{ error }}</p>
+            	{%endfor%}
+	{% for error in form.time.errors %}
+           </p> <span style="color: red;">{{ error }}</p>
+            	{%endfor%}
 
 </form>
 

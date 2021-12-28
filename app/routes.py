@@ -183,5 +183,22 @@ def create_user():
         db.session.add(user)
         db.session.commit()
         flash('User created successfuly!')
+        flash(f"Link for settig password: {url_for('set_password')}/{user.private_key}")
 
     return render_template('create_user.html',title='Create new user',form=form)
+
+
+@app.route('/add-category',methods=['GET','POST'])
+@login_required
+def create_category():
+
+    form = CreateCategoryForm()
+
+    if form.validate_on_submit():
+        category = Category(name=form.category_name.data)
+
+        db.session.add(category)
+        db.session.commit()
+        flash('Category created successfuly')
+
+    return render_template('create_category.html',title='Create Category',form=form)

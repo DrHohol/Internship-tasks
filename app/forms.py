@@ -67,10 +67,15 @@ class CreateUserForm(FlaskForm):
             raise ValidationError('Please use a different username.')
 
 class SetPasswordForm(FlaskForm):
-    '''Setting for new user by himself'''
+    '''Setting password for new user by himself'''
     password = PasswordField('Password',validators=[DataRequired()])
     password_check = PasswordField(
         'Repeat password',validators=[DataRequired(),EqualTo('password')])
 
     sumbit = SubmitField('Sumbit')
 
+class CreateCategoryForm(FlaskForm):
+    '''Create new category'''
+
+    category_name = StringField('Category name',validators=[DataRequired()])
+    create = SubmitField('Create')

@@ -4,13 +4,19 @@ from functools import wraps
 from app.models import User
 
 
-def validate_creation(uname,role):
+def validate_creation(data):
+    if not data.get('First_Name') or not data.get('First_Name') or not data.get('role'):
+        return 'Required fields are not filled'
+    user = User.query.filter_by(username=data['username']).first()
+    if user:
+        return 'User Already Exist'
+    print(data['role'])
+    if int(data['role']) > 3 or int(data['role']) < 0:
+        return 'Role is not valid'
+    print(data.get('First_Name'))
+    
 
-    user = User.query.filter_by(username=uname).first()
-    if int(role) > 3 or int(role) < 0:
-        return jsonify('role is not valid')
-
-    return user
+    return None
 
 def get_final_grade(interview):
     totalmax = 0
@@ -45,5 +51,18 @@ def token_required(f):
             return {'Error':'Wrong apikey'}
         print(current_user)
         return f(current_user,*args,**kwargs)
+
+    return decorated
+
+def permissions_required(f):
+    @wraps(f)
+    def decorated(*args,**kwargs):
+        apikey = request.headers.get('x-api-key')
+        
+        current_user = User.query.filter_by(private_key=apikey).first()
+        if current_user.role != 0:
+            return {'Error':'Only admins can do it'}
+
+        return f(*args,**kwargs)
 
     return decorated

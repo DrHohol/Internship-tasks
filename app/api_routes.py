@@ -1,35 +1,54 @@
 from app.models import *
 from flask import request, jsonify
 from flask_restful import Resource
-from app.utils import validate_creation, token_required, get_final_grade
+from app.utils import validate_creation, token_required, get_final_grade, permissions_required
 from app import db
 from app.schema import *
 import secrets
 import datetime
 
 
-class UserCreateApi(Resource):
+class UserApi(Resource):
 
     @token_required
+    @permissions_required
     def post(current_user,self):
 
-        if current_user.role != 0:
-            print(current_user.role)
-            return{'Error':'You are not admin'}
+        errors = validate_creation(request.form)
+        if errors:
+            return {'Error':errors}
 
+        schema = UserSchema()
         username = request.form['username']
         firstname = request.form['First_Name']
         lastname = request.form['Last_Name']
         role = request.form['role']
-
-        if validate_creation(username,role):
-            return {'error':'Fields are not valid'}
-
+        
         user = User(username=username,first_name=firstname,last_name=lastname,role=role,private_key=secrets.token_urlsafe(16))
         db.session.add(user)
         db.session.commit()
 
-        return {'Success':True}
+        return jsonify({'Success':True,'User':schema.dump(user)})
+
+    @token_required
+    @permissions_required
+    def delete(current_user,self):
+
+        user = User.query.filter_by(id=request.form['id'])
+        if not user:
+            return {'Error':'User does not exist'}
+
+        db.session.delete(user)
+        db.session.commit()
+
+    @token_required
+    @permissions_required
+    def get(current_user,self):
+        
+        schema = UserSchema(many=True)
+        users = User.query.all()
+
+        return jsonify(schema.dump(users))
 
 
 class SetPasswordApi(Resource):
@@ -103,14 +122,36 @@ class GetInterviewInfoApi(Resource):
 
     @token_required
     def get(current_user,self):
-        schema = InterviewSchema()
 
         interview_id = request.args['id']
-        print(interview_id)
         interview = Interview.query.filter_by(id=interview_id).first()
+        if not interview:
+            return {'Error':'Interview does not exist'}
+        if current_user not in interview.interviewer and current_user not in [interview.recrutier]:
+            return {'Error':'You are not allowed to this interview'}
+
+        schema = InterviewSchema()
+
+        print(interview_id)
         print(interview.recrutier)
 
         return jsonify(schema.dump(interview))
+
+    @token_required   
+    def delete(current_user,self):
+
+        interview_id = request.form['id']
+        interview = Interview.query.filter_by(id=interview_id).first()
+        if not interview:
+            return {'Error':'Interview does not exist'}
+        if current_user not in interview.interviewer and current_user not in [interview.recrutier]:
+            return {'Error':'You are not allowed to this interview'}
+        db.session.delete(interview)
+        db.session.commit()
+
+        return {'Success':True}
+
+
 
 
 class GradeAnswerApi(Resource):
@@ -131,11 +172,13 @@ class GradeAnswerApi(Resource):
             return {'Error':'Grade is not a number'}
         if grade > question.max_grade:
             return{'Error':'Grade bigger than maximum'}
+        '''Check user relation to interview'''
+        if current_user not in interview.interviewer and current_user not in [interview.recrutier]: 
+            return {'Error':'You are not allowed to this interview'}
 
         '''check if grade already exist'''
         a_grade = Grades.query.filter_by(
             interview_id=interview.id).filter_by(interviewer_id=current_user.id).filter_by(question_id=request.form['question_id']).first()
-        print(a_grade)
         if a_grade is not None:
             a_grade.grade = grade
             print(f'New grade is: {grade}')
@@ -143,7 +186,6 @@ class GradeAnswerApi(Resource):
         else:
             recieved_grade = Grades(question=question,interview=interview,grade=grade,interviewer=current_user)
             db.session.add(recieved_grade)
-        print(interview.grades)
         interview.final_grade = get_final_grade(interview)
         db.session.commit()
         return jsonify(schema.dump(recieved_grade))
@@ -158,7 +200,6 @@ class CreateQuestionApi(Resource):
         schema = QuestionSchema()
         question_text = request.form['question']
         max_grade = request.form['max_grade']
-
         category = Category.query.filter_by(id=request.form['category']).first()
         
         try:
