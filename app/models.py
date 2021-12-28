@@ -27,8 +27,8 @@ class User(db.Model,UserMixin):
     private_key = db.Column(db.String(24),unique=True)
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(64),index=True,unique=True)
-    first_name = db.Column(db.String(64))
-    last_name = db.Column(db.String(64))
+    first_name = db.Column(db.String(64),nullable=True)
+    last_name = db.Column(db.String(64),nullable=True)
     role = db.Column(db.Integer)
     password_hash = db.Column(db.String(256))
 
