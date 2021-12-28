@@ -101,9 +101,3 @@ class Category(db.Model):
     def __repr__(self):
 
         return self.name
-
-
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Interview, db.session))
-admin.add_view(ModelView(Questions, db.session))
-admin.add_view(ModelView(Category, db.session))
