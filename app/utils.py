@@ -3,11 +3,6 @@ from flask import jsonify, request
 from functools import wraps
 from app.models import User
 
-def valid_key(key):
-
-    valid = User.query.filter_by(private_key=key).first()
-    
-    return valid
 
 def validate_creation(uname,role):
 

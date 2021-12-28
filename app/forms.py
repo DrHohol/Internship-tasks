@@ -37,7 +37,7 @@ class GradeInterviewForm(FlaskForm):
 
         max_grade = Questions.query.filter_by(id=question.data.get('question')).first().max_grade
         if grade.data > max_grade:
-            raise ValidationError('Grade bigger that maximum for this question')
+            raise ValidationError('Grade is bigger than maximum for this question')
 
     question = SelectField('question',choices=[], validators=[DataRequired()])
     grade = IntegerField('grade',validators=[DataRequired(),NumberRange(min=0),max_grade])

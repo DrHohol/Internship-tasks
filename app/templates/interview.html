@@ -3,7 +3,12 @@
 {% block content %}
 
 {{ interview }}
-
+<p><b>Interviewers:</b>
+{% for interviewer in interview.interviewer %}
+{{ interviewer }};
+{% endfor %}</p>
+<p><b>HR:</b> {{ interview.recrutier }}</p>
+<h4>Questions:</h4>
 {% for q in interview.question %}
 <p>{{q}}</p>
 {% endfor %}

@@ -1,11 +1,12 @@
 from app.models import *
 from flask import request, jsonify
 from flask_restful import Resource
-from app.utils import valid_key, validate_creation, token_required
+from app.utils import validate_creation, token_required, get_final_grade
 from app import db
 from app.schema import *
 import secrets
 import datetime
+
 
 class UserCreateApi(Resource):
 
@@ -30,6 +31,7 @@ class UserCreateApi(Resource):
 
         return {'Success':True}
 
+
 class SetPasswordApi(Resource):
 
     @token_required
@@ -50,6 +52,7 @@ class GetInterviewsApi(Resource):
         schema = InterviewSchema(many=True)
         return jsonify({'interviews':schema.dump(interviews)})
 
+
 class CreateInterviewApi(Resource):
 
     @token_required
@@ -57,11 +60,17 @@ class CreateInterviewApi(Resource):
         schema = InterviewSchema()
         data = request.form
         interviewers = []
+        questions = []
         
         for interviewer in data['interviewers'].split(','):
             interviewer = User.query.filter_by(username=interviewer).first()
             if interviewer is not None:
                 interviewers.append(interviewer)
+
+        for question in data['questions'].split(','):
+            question = Questions.query.filter_by(id=question).first()
+            if question:
+                questions.append(question)
 
         recrutier = User.query.filter_by(role=1).filter_by(username=data['recrutier']).first()
 
@@ -103,9 +112,9 @@ class GetInterviewInfoApi(Resource):
 
         return jsonify(schema.dump(interview))
 
+
 class GradeAnswerApi(Resource):
     
-    #grade = Grades(question=quest,interview=interview,grade=form.grade.data,interviewer=current_user)
     @token_required
     def post(current_user,self):
         schema = GradeSchema()
@@ -116,15 +125,48 @@ class GradeAnswerApi(Resource):
         interview = Interview.query.filter_by(id=request.form['interview_id']).first()
         if interview is None:
             return {'Error': 'Invalid interview id'}    
-        grade = int(request.form['grade'])
+        try:
+            grade = int(request.form['grade'])
+        except ValueError:
+            return {'Error':'Grade is not a number'}
         if grade > question.max_grade:
             return{'Error':'Grade bigger than maximum'}
 
-        recieved_grade = Grades(question=question,interview=interview,grade=grade,interviewer=current_user)
-
-        db.session.add(recieved_grade)
+        '''check if grade already exist'''
+        a_grade = Grades.query.filter_by(
+            interview_id=interview.id).filter_by(interviewer_id=current_user.id).filter_by(question_id=request.form['question_id']).first()
+        print(a_grade)
+        if a_grade is not None:
+            a_grade.grade = grade
+            print(f'New grade is: {grade}')
+            recieved_grade = a_grade
+        else:
+            recieved_grade = Grades(question=question,interview=interview,grade=grade,interviewer=current_user)
+            db.session.add(recieved_grade)
+        print(interview.grades)
+        interview.final_grade = get_final_grade(interview)
         db.session.commit()
         return jsonify(schema.dump(recieved_grade))
 
 
 
+class CreateQuestionApi(Resource):
+
+    @token_required
+    def post(current_user,self):
+
+        schema = QuestionSchema()
+        question_text = request.form['question']
+        max_grade = request.form['max_grade']
+
+        category = Category.query.filter_by(id=request.form['category']).first()
+        
+        try:
+            if category:
+                question = Questions(question=question_text,max_grade=int(request.form['max_grade']),category=category)
+            else:
+                question = Questions(question=question_text,max_grade=int(request.form['max_grade'])) 
+        except:
+            return {'Error':'Invalid data'}
+
+        return jsonify(schema.dump(question))

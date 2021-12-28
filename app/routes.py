@@ -6,7 +6,7 @@ from app.models import User, Questions, Interview, Category, Grades
 from flask_login import current_user, login_user, logout_user, login_required
 import secrets
 from app.schema import *
-from app.utils import valid_key, get_final_grade
+from app.utils import get_final_grade
 
 '''
 Accept:application/json
