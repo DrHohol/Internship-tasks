@@ -90,7 +90,7 @@ class CreateInterviewApi(Resource):
             if question:
                 questions.append(question)
 
-        recrutier = User.query.filter_by(role=1).filter_by(username=data['recrutier']).first()
+        recrutier = User.query.filter_by(role=2).filter_by(username=data['recrutier']).first()
 
         '''validate not required field "time" '''
         if data.get('time'):
@@ -108,7 +108,7 @@ class CreateInterviewApi(Resource):
         '''validate required fields and create Interview object'''
         try:
             interview = Interview(title=data['title'],candidat=data['candidat'],recrutier=recrutier,
-                                    interviewer=interviewers,zoom_link=data.get('zoom'),time=time,date=date) #[param] for datarequired
+                                    interviewer=interviewers,zoom_link=data.get('zoom'),time=time,date=date,question=questions) #[param] for datarequired
         except KeyError:
             return {'Error':'Some data invalid'}
 
