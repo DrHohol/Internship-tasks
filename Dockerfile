@@ -11,7 +11,7 @@ RUN apt-get update && pip install --upgrade pip && \
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV FLASK_APP = 'int_platform.py'
-ENV DATABASE_URL="postgresql://xoxoji:password@192.168.0.105/inter_platform"
+ENV DATABASE_URL="postgresql://xoxoji:password@172.17.0.1/inter_platform"
 
 COPY requirements.txt /app/requirements.txt
 
