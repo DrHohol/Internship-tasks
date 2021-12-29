@@ -9,21 +9,8 @@ from app.schema import *
 from app.utils import get_final_grade
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers.response import Response
+from urllib.parse import urlparse
 
-'''
-Accept:application/json
-if request.headers.get('Accept') == 'application/json':
-    #{'experts':[recrutier.username for recrutier in User.query.filter_by(role=1).all()]}
-
-    key = request.headers.get('x-api-key')
-    if valid_key(key):
-        users = User.query.filter_by(private_key=key ).first()
-        print(users)
-        user_schema = UserSchema()
-        return jsonify(user_schema.dump(users))
-    else:
-        return jsonify({'Error':'Key does not exist'})
-'''
 
 @app.route('/')
 def index():
@@ -110,8 +97,11 @@ def create_question():
 
     form = QuestionCreateForm()
     form.category.choices = [(category.id, category.name) for category in Category.query.all()]
+    categories = [Category.query.filter_by(id=category).first() for category in form.category.data]
+    print(categories)
     if form.validate_on_submit():
-        new_question = Questions(question=form.question.data,max_grade=form.max_grade.data)
+        print(form.category.data)
+        new_question = Questions(question=form.question.data,max_grade=form.max_grade.data,category=categories)
 
         db.session.add(new_question)
         db.session.commit()
@@ -175,7 +165,8 @@ def set_password():
         user.private_key = secrets.token_urlsafe(16)
         db.session.add(user)
         db.session.commit()
-        flash('Password ')
+        flash('Password set successfuly')
+        flash(f"Your new apikey is: {user.private_key}")
 
     return render_template('set_password.html',form=form)
 
@@ -190,7 +181,7 @@ def create_user():
         db.session.add(user)
         db.session.commit()
         flash('User created successfuly!')
-        flash(f"Link for settig password: {url_for('set_password')}/{user.private_key}")
+        flash(f"Link for settig password: {request.host_url[:-1]}{url_for('set_password')}?key={user.private_key}")
 
     return render_template('create_user.html',title='Create new user',form=form)
 

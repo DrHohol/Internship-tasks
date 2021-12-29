@@ -57,7 +57,7 @@ class CreateUserForm(FlaskForm):
     username = StringField('Username',validators=[DataRequired()])
     firstname = StringField('First Name',validators=[DataRequired()])
     lastname = StringField('Last Name',validators=[DataRequired()])
-    role = SelectField('recrutier',choices=[(1,'interviewer'),(2,'expert')],validators=[DataRequired()],coerce=int)
+    role = SelectField('recrutier',choices=[(2,'recrutier'),(1,'expert')],validators=[DataRequired()],coerce=int)
 
     create = SubmitField('Create')
 

@@ -65,7 +65,6 @@ class GetInterviewsApi(Resource):
 
     @token_required
     def get(current_user,self):
-        schema = UserSchema()
         interviews = current_user.interview
         print(interviews)
         schema = InterviewSchema(many=True)
@@ -192,7 +191,7 @@ class GradeAnswerApi(Resource):
 
 
 
-class CreateQuestionApi(Resource):
+class QuestionApi(Resource):
 
     @token_required
     def post(current_user,self):
@@ -201,13 +200,33 @@ class CreateQuestionApi(Resource):
         question_text = request.form['question']
         max_grade = request.form['max_grade']
         category = Category.query.filter_by(id=request.form['category']).first()
+        print(category)
         
         try:
             if category:
-                question = Questions(question=question_text,max_grade=int(request.form['max_grade']),category=category)
+                question = Questions(question=question_text,max_grade=int(request.form['max_grade']),category=[category])
             else:
                 question = Questions(question=question_text,max_grade=int(request.form['max_grade'])) 
-        except:
+        except Exception as e:
+            print(e)
+
             return {'Error':'Invalid data'}
 
+        db.session.add(question)
+        db.session.commit()
         return jsonify(schema.dump(question))
+
+    @token_required
+    def get(current_user,self):
+
+        schema = QuestionSchema(many=True)
+        if request.args.get('all'):
+
+            questions = Questions.query.all()
+            
+            return jsonify(schema.dump(questions))
+
+        if request.args.get('category'):
+            category = Category.query.filter_by(id=request.args.get('category')).first()
+
+            return jsonify(schema.dump(category.questions))

@@ -70,7 +70,6 @@ class Questions(db.Model):
 
     id = db.Column(db.Integer,primary_key=True)
     question = db.Column(db.String(128))
-    grade = db.Column(db.Integer)
     max_grade = db.Column(db.Integer)
     category = db.relationship('Category',backref='questions',lazy=True,secondary=category_ident)
 

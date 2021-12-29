@@ -9,7 +9,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 		model = User
 		include_relationship = True
 		load_instance = True
-		exclude = ['private_key','password_hash','id','role']
+		exclude = ['password_hash','id','role']
 
 	id = ma.auto_field()
 
@@ -21,9 +21,9 @@ class InterviewSchema(ma.SQLAlchemyAutoSchema):
 		load_instance = True
 
 	id = ma.auto_field()
-	recrutier = fields.Nested("UserSchema")
+	recrutier = fields.Nested("UserSchema",exclude=['private_key'])
 	question = fields.Nested("QuestionSchema",many=True)
-	interviewer = fields.Nested("UserSchema",many=True)
+	interviewer = fields.Nested("UserSchema",many=True,exclude=['private_key'])
 	grades = fields.Nested('GradeSchema',many=True)
 
 class QuestionSchema(ma.SQLAlchemyAutoSchema):
@@ -34,6 +34,7 @@ class QuestionSchema(ma.SQLAlchemyAutoSchema):
 		load_instance = True
 
 	id = ma.auto_field()
+	category = fields.Nested('CategorySchema',many=True,exclude=['id'])
 
 class GradeSchema(ma.SQLAlchemyAutoSchema):
 
@@ -43,4 +44,11 @@ class GradeSchema(ma.SQLAlchemyAutoSchema):
 		load_instance = True
 		exclude = ['id']
 
-	question = fields.Nested('QuestionSchema',exclude=['grade'])
+	question = fields.Nested('QuestionSchema')
+
+class CategorySchema(ma.SQLAlchemyAutoSchema):
+
+	class Meta:
+		model = Category
+		include_relationship = True
+		load_instance = True
