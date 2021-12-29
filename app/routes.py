@@ -199,3 +199,18 @@ def create_category():
         flash('Category created successfuly')
 
     return render_template('create_category.html',title='Create Category',form=form)
+
+
+@app.route('/edit-question',methods=['GET','POST'])
+@login_required
+def edit_question():
+    form = EditQuestionForm()
+
+    form.question.choices = [(question.id,question.question) for question in Questions.query.all()]
+    if form.validate_on_submit():
+        question = Questions.query.filter_by(id=form.question.data).first()
+        question.max_grade = form.new_max.data
+        question.question = form.new_text.data
+        db.session.commit()
+
+    return render_template('edit_question.html',form=form,title='Edit question')

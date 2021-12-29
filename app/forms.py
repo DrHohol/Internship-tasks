@@ -79,3 +79,11 @@ class CreateCategoryForm(FlaskForm):
 
     category_name = StringField('Category name',validators=[DataRequired()])
     create = SubmitField('Create')
+
+class EditQuestionForm(FlaskForm):
+    '''edit or delete question'''
+    question = SelectField('Question',choices=[],validators=[DataRequired()],coerce=int)
+
+    new_text = StringField('Text',validators=[DataRequired()])
+    new_max = IntegerField('New maximum grade',validators=[DataRequired()])
+    sumbit = SubmitField('Sumbit')

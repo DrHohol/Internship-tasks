@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<h1 align="center">Welcome to Interviewer Helper</h1>
-
+{% if current_user.is_authenticated %}
+<h1 align="center">Welcome to Interviewer Helper {{ current_user.username }}!</h1>
+<p>your apikey is {{ current_user.private_key }}</p>
+{% else %}
+<h1 align="center">Welcome to Interviewer Helper. Please log in</h1>
+{% endif %}
 {% endblock %}

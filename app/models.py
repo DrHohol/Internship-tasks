@@ -50,8 +50,8 @@ class Interview(db.Model):
     recrutier_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     
     question = db.relationship('Questions',backref=db.backref('interviews',lazy=True),
-                                lazy='subquery',secondary=question_indef)
-    interviewer = db.relationship('User',backref=db.backref('interview'),lazy='subquery',secondary=expert_ident)
+                                lazy='subquery',secondary=question_indef,cascade="all,delete")
+    interviewer = db.relationship('User',backref=db.backref('interview'),lazy='subquery',secondary=expert_ident,cascade="all,delete")
     candidat = db.Column(db.String)
     final_grade = db.Column(db.Integer)
     zoom_link = db.Column(db.String)
@@ -80,12 +80,12 @@ class Questions(db.Model):
 class Grades(db.Model):
 
     id = db.Column(db.Integer,primary_key=True)
-    question_id = db.Column(db.Integer,db.ForeignKey('questions.id'))
-    question = db.relationship('Questions',backref='grades',cascade='all,')
-    interviewer_id = db.Column(db.Integer,db.ForeignKey('user.id'))
-    interviewer = db.relationship('User',backref='grades',cascade='all, delete')
-    interview_id = db.Column(db.Integer,db.ForeignKey('interview.id'))
-    interview = db.relationship('Interview',backref='grades',cascade='all, delete')
+    question_id = db.Column(db.Integer,db.ForeignKey('questions.id',ondelete="CASCADE"))
+    question = db.relationship('Questions',backref=db.backref('grades',cascade="all,delete"))
+    interviewer_id = db.Column(db.Integer,db.ForeignKey('user.id',ondelete="CASCADE"))
+    interviewer = db.relationship('User',backref=db.backref('grades',cascade="all,delete"))
+    interview_id = db.Column(db.Integer,db.ForeignKey('interview.id',ondelete="CASCADE"))
+    interview = db.relationship('Interview',backref=db.backref('grades',cascade="all,delete"))
     grade = db.Column(db.Integer)
 
     def __repr__(self):

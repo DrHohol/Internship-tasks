@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<form method="post">
+	{{ form.hidden_tag() }}
+	Select question:
+	<p>{{ form.question }}</p>
+	New question text
+	<p>{{ form.new_text }}</p>
+	New maximum grade
+	<p>{{ form.new_max }}</p>
+	<p>{{ form.sumbit }}</p>
+
+</form>
+
+{% endblock %}
