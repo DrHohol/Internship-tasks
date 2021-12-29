@@ -96,9 +96,8 @@ def logout():
 def create_question():
 
     form = QuestionCreateForm()
-    form.category.choices = [(category.id, category.name) for category in Category.query.all()]
     categories = [Category.query.filter_by(id=category).first() for category in form.category.data]
-    print(categories)
+    form.category.choices = [(category.id, category.name) for category in Category.query.all()]
     if form.validate_on_submit():
         print(form.category.data)
         new_question = Questions(question=form.question.data,max_grade=form.max_grade.data,category=categories)
