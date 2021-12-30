@@ -36,7 +36,7 @@ class AdminModelView(ModelView):
         if current_user.is_authenticated:
         	if current_user.role == 0:
         		return True
-        return current_user.is_authenticated
+        return False
 
 admin.add_view(AdminModelView(models.User, db.session,name='Users'))
 admin.add_view(AdminModelView(models.Interview, db.session, name='Interviews'))

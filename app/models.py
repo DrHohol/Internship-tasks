@@ -50,8 +50,8 @@ class Interview(db.Model):
     recrutier_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     
     question = db.relationship('Questions',backref=db.backref('interviews',lazy=True),
-                                lazy='subquery',secondary=question_indef,cascade="all,delete")
-    interviewer = db.relationship('User',backref=db.backref('interview'),lazy='subquery',secondary=expert_ident,cascade="all,delete")
+                                lazy='subquery',secondary=question_indef)
+    interviewer = db.relationship('User',backref=db.backref('interview'),lazy='subquery',secondary=expert_ident)
     candidat = db.Column(db.String)
     final_grade = db.Column(db.Integer)
     zoom_link = db.Column(db.String)

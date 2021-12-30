@@ -57,7 +57,7 @@ class SetPasswordApi(Resource):
     def post(current_user,self):
 
         current_user.set_password(request.form['password'])
-
+        db.session.commit()
         return {'Success':True}
 
 
