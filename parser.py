@@ -23,7 +23,6 @@ class Parser(DatabaseMapper):
 
         for option in galuzi.find_all('option'):
             if option['value'] != '0':
-                print(option['value'],option.text)
                 links_of_areas.append({'name':option.text,
                     'link':f'https://vstup.osvita.ua/spec/1-40-1/0-{option["value"]}-0-104-0-0','code':option["value"]})
                 DatabaseMapper().add_area(option.text,option['value'])

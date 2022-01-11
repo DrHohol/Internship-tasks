@@ -16,6 +16,10 @@ class Zno_subj(Base):
 	id = Column(Integer,primary_key=True)
 	name = Column(String)
 
+	def __repr__(self):
+
+		return self.name
+
 class Grades(Base):
 	__tablename__ = 'grades'
 
@@ -24,6 +28,11 @@ class Grades(Base):
 	owner = relationship('Users',backref='grades')
 	zno_id = Column(Integer,ForeignKey('zno_subj.id'))
 	zno = relationship('Zno_subj',backref='grades')
+	grade = Column(Integer)
+
+	def __repr__(self):
+
+		return f'Ваша оценка по {self.zno}: {self.grade}'
 
 class Coefficient(Base):
 	__tablename__ = 'coefficient'

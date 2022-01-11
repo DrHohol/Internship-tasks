@@ -64,3 +64,36 @@ class DatabaseMapper():
 
             self.session.commit()
 
+    def create_user(self,tg_id):
+
+        user = self.session.query(Users).filter_by(tg_id=tg_id).first()
+
+        if not user:
+
+            user = Users(tg_id=tg_id)
+
+            self.session.add(user)
+            self.session.commit()
+
+    def get_grades(self,user):
+
+        grades = self.session.query(Users).filter_by(tg_id=user).first().grades
+        return (str(grade) for grade in grades)
+
+    def set_grade(self,user,data):
+
+        user = self.session.query(Users).filter_by(tg_id=user).first()
+        zno = self.session.query(Zno_subj).filter_by(name=data).first()
+        grade = self.session.query(Grades).filter(owner=user,zno_subj=zno).first()
+        if not grade:
+            grade = Grades(owner=user,grade=data['grade'],zno=zno)
+            self.session.add(grade)
+        else:
+            grade.grade = data['grade']
+        self.session.commit()
+
+    def all_znos(self):
+
+        znos = self.session.query(Zno_subj).all()
+
+        return [str(zno) for zno in znos]
