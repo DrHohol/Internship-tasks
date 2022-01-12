@@ -82,15 +82,30 @@ class DatabaseMapper():
 
     def set_grade(self,user,data):
 
+
         user = self.session.query(Users).filter_by(tg_id=user).first()
-        zno = self.session.query(Zno_subj).filter_by(name=data).first()
-        grade = self.session.query(Grades).filter(owner=user,zno_subj=zno).first()
+        zno = self.session.query(Zno_subj).filter_by(name=data['name']).first()
+        grade = self.session.query(Grades).filter_by(owner_id=user.id,zno=zno).first()
+
         if not grade:
-            grade = Grades(owner=user,grade=data['grade'],zno=zno)
-            self.session.add(grade)
+
+            if data['grade'] != 0:
+                grade = Grades(owner=user,grade=data['grade'],zno=zno)
+                self.session.add(grade)
+                self.session.commit()
+                return 'Оценка успешно добавлена.'
+            else: return 'У вас ещё нет оценки по этому предмету.'
+            
         else:
-            grade.grade = data['grade']
-        self.session.commit()
+            if data['grade'] == 0:
+                self.session.delete(grade)
+                self.session.commit()
+                return 'Оценка успешна удалена.'
+            else:
+                grade.grade = data['grade']
+                self.session.commit()
+                return 'Оценка успешна обновлена.'
+        
 
     def all_znos(self):
 
