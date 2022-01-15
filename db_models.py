@@ -36,7 +36,7 @@ class Grades(Base):
 
     def __repr__(self):
 
-        return f'Ваша оценка по {self.zno}: {self.grade}'
+        return f'Ваш бал з {self.zno}: {self.grade}'
 
 
 class Coefficient(Base):
@@ -52,7 +52,7 @@ class Coefficient(Base):
 
     def __repr__(self):
 
-        return f'ЗНО {self.zno} имеет коэффициент {self.coefficient}'
+        return f'ЗНО {self.zno} має коефiцiєнт {self.coefficient}'
 
 class Knowledge_area(Base):
     __tablename__ = 'knowledge_area'

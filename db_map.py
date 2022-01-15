@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db_models import *
+import os
 
-engine = create_engine('postgresql:///vstup_db')
+engine = create_engine(os.environ.get('DATABASE_URL') or 'postgresql:///vstup_db')
 
 Base.metadata.create_all(engine)
 
@@ -94,19 +95,19 @@ class DatabaseMapper():
                 grade = Grades(owner=user, grade=data['grade'], zno=zno)
                 self.session.add(grade)
                 self.session.commit()
-                return 'Оценка успешно добавлена.'
+                return 'Оцiнка успiшно добавлена'
             else:
-                return 'У вас ещё нет оценки по этому предмету.'
+                return 'У вас ще немає оцiнки з цього предмету.'
 
         else:
             if data['grade'] == 0:
                 self.session.delete(grade)
                 self.session.commit()
-                return 'Оценка успешна удалена.'
+                return 'Оцiнка успiшно видалена.'
             else:
                 grade.grade = data['grade']
                 self.session.commit()
-                return 'Оценка успешна обновлена.'
+                return 'Оцiнка успiшно обновлена.'
 
     def all_znos(self):
 
@@ -140,13 +141,13 @@ class DatabaseMapper():
 
             if grade >= speciality.min_rate_budget:
 
-                return 'Поздравляем! Вы можете поступить на бюджет!'
+                return 'Вiтаємо! Ви можете поступити на бюджет'
             if grade >= (speciality.min_rate_pay - 10):
 
-                return 'Поздравляем! Вы можете поступить на контракт'
+                return 'Вiтаємо! Ви можете поступити за контрактом'
             else:
 
-                return 'К сожалению вы не можете поступить на эту специальность'
+                return 'Нажаль ви не можете поступити за цiєю спецiальнiстю'
 
         else:
             area = self.session.query(Knowledge_area).filter(

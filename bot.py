@@ -23,31 +23,31 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 @dp.message_handler(commands=['help', 'start'], state='*')
 async def hello(message: types.Message):
     await message.answer('''
-        Привет! Этот бот поможет тебе узнать куда ты можешь поступить!''',
+        Привiт! Цей бот допоможе тобi дiзнатись ви можете поступити!''',
                          reply_markup=Keyboard.home)
     db.create_user(message.from_user.id)
 
 
 @dp.message_handler(Text(equals='Назад', ignore_case=True), state='*')
 async def get_grades(message: types.Message, state: FSMContext):
-    await message.answer('Возвращаемся назад...',
+    await message.answer('Повертаємось назад...',
                          reply_markup=Keyboard.home)
     await state.finish()
 
 ''' Choose method '''
 
 
-@dp.message_handler(Text(equals='Добавить оценки ЗНО', ignore_case=True), state='*')
+@dp.message_handler(Text(equals='Додати оцiнки ЗНО', ignore_case=True), state='*')
 async def get_grades(message: types.Message):
-    msg = await message.answer('Выберите предмет:',
+    msg = await message.answer('Оберiть предмет:',
                                reply_markup=Buttons.select_zno)
 
 
-@dp.message_handler(Text(equals='Мои баллы', ignore_case=True), state='*')
+@dp.message_handler(Text(equals='Мои бали', ignore_case=True), state='*')
 async def get_grades(message: types.Message):
     grades = '\n'.join(db.get_grades(message.from_user.id))
     if not grades:
-        await message.answer("У вас нет оценок.")
+        await message.answer("У вас немає оцiнок.")
     else:
         await message.answer('\n'.join(db.get_grades(message.from_user.id)))
 
@@ -64,7 +64,7 @@ async def set_zno_grade(callback_query: types.CallbackQuery, state: FSMContext):
 
     await Grades.grade.set()
     await callback_query.answer()
-    await callback_query.message.answer(f'Введите балл по предмету: {subject}\nДля удаления введите 0',
+    await callback_query.message.answer(f'Введiть балл з: {subject}\nДля видалення введiть 0',
                                         reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(types.KeyboardButton('Назад')))
 
 ''' setting grade and finish state '''
@@ -87,15 +87,15 @@ async def math(message: types.Message, state: FSMContext):
                 raise ValueError
 
         except ValueError:
-            await message.answer('Некорректное значение')
+            await message.answer('Невiрне значення')
 
 ''' choose area '''
 
 
-@dp.message_handler(Text(equals='Куда я могу поступить?', ignore_case=True), state='*')
+@dp.message_handler(Text(equals='Куди я можу поступити?', ignore_case=True), state='*')
 async def get_grades(message: types.Message):
 
-    await message.answer("Выберите область знаний:",
+    await message.answer("Оберiть галузь знань:",
                          reply_markup=Buttons.select_area)
     await Grades.choose_area.set()
 
@@ -104,7 +104,7 @@ async def get_grades(message: types.Message):
 async def choose_area(callback_query: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data['area'] = callback_query.data
-    await callback_query.message.edit_text('Выберите специальность')
+    await callback_query.message.edit_text('Оберiть спецiальнiсть')
     await callback_query.message.edit_reply_markup(Buttons.gen_specs(callback_query.data))
     await Grades.choose_spec.set()
     await callback_query.answer()
@@ -116,11 +116,15 @@ async def choose_spec(callback_query: types.CallbackQuery, state: FSMContext):
         async with state.proxy() as data:
             abilities = db.grades_for_spec(
                 tgid=callback_query.from_user.id, area=data['area'])
-        nl = '\n'
-        message = f"*Вы можете поступить на бюджет:*\n{nl.join(abilities['budget'])}\n\n*На контракт:*\n{nl.join(abilities['contract'])}"
-        await callback_query.message.answer(message, parse_mode=types.ParseMode.MARKDOWN)
+        if abilities['budget'] or abilities['contract']:
+            nl = '\n'
+            message = f'''*Ви можете поступити на бюджет:*\n{nl.join(
+                abilities['budget'])}\n\n *На контракт:*\n{nl.join(abilities['contract'])}'''
+            await callback_query.message.answer(message, parse_mode=types.ParseMode.MARKDOWN)
+        else:
+            await callback_query.message.answer('Нажаль ви не можете поступити в цiй галузi.')
     elif callback_query.data == 'back':
-        await callback_query.message.edit_text('Выберите область')
+        await callback_query.message.edit_text('Оберiть галузь знань')
         await callback_query.message.edit_reply_markup(Buttons.select_area)
         await Grades.choose_area.set()
     else:

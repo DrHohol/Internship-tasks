@@ -6,9 +6,9 @@ from db_map import DatabaseMapper
 
 class Keyboard():
 
-    button_add = KeyboardButton('Добавить оценки ЗНО')
-    button_my = KeyboardButton('Мои баллы')
-    button_where = KeyboardButton('Куда я могу поступить?')
+    button_add = KeyboardButton('Додати оцiнки ЗНО')
+    button_my = KeyboardButton('Мои бали')
+    button_where = KeyboardButton('Куди я можу поступити?')
 
     home = ReplyKeyboardMarkup(resize_keyboard=True)
     home.add(button_add, button_my)
@@ -43,7 +43,7 @@ class Buttons():
             select_spec.insert(InlineKeyboardButton(
                 text=spec, callback_data=spec[0:30]))
         select_spec.add(InlineKeyboardButton(
-                text='Все специальности', callback_data='all'))
+                text='Усi спецiальностi', callback_data='all'))
         select_spec.add(InlineKeyboardButton(
                 text='Назад', callback_data='back'))
 
