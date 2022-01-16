@@ -3,7 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from db_models import *
 import os
 
-engine = create_engine(os.environ.get('DATABASE_URL') or 'postgresql:///vstup_db')
+engine = create_engine(os.environ.get('DATABASE_URL')
+                       or 'postgresql://xoxoji:password@localhost/vstup_db')
 
 Base.metadata.create_all(engine)
 
@@ -95,7 +96,7 @@ class DatabaseMapper():
                 grade = Grades(owner=user, grade=data['grade'], zno=zno)
                 self.session.add(grade)
                 self.session.commit()
-                return 'Оцiнка успiшно добавлена'
+                return 'Оцiнка успiшно додана'
             else:
                 return 'У вас ще немає оцiнки з цього предмету.'
 

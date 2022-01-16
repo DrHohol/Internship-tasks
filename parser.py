@@ -59,7 +59,7 @@ class Parser(DatabaseMapper):
             try:
                 linkfordetails = soup.findAll(
                     'table', class_="stats-vnz-table")[0].find('a')
-            except KeyError:
+            except (KeyError,ValueError):
                 continue
 
             links_f_details = f"{host}{linkfordetails.get('href')}"
