@@ -55,11 +55,10 @@ class Parser(DatabaseMapper):
             spec['program'] = soup.find(
                 'div', class_='page-vnz-detail-title').find('h1').findAll('b')[0].text
             coefficients = Parser.get_coefficients(soup)
-            print(coefficients)
             try:
                 linkfordetails = soup.findAll(
                     'table', class_="stats-vnz-table")[0].find('a')
-            except (KeyError,ValueError):
+            except (KeyError,ValueError,IndexError):
                 continue
 
             links_f_details = f"{host}{linkfordetails.get('href')}"

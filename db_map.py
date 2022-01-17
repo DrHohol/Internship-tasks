@@ -4,7 +4,7 @@ from db_models import *
 import os
 
 engine = create_engine(os.environ.get('DATABASE_URL')
-                       or 'postgresql://xoxoji:password@localhost/vstup_db')
+                       or 'postgresql://xoxoji:Dbpassword1@database-1.cz11cjovxwbb.eu-central-1.rds.amazonaws.com/vstup_db')
 
 Base.metadata.create_all(engine)
 
@@ -18,6 +18,7 @@ class DatabaseMapper():
     def add_area(self, name, code):
 
         area = self.session.query(Knowledge_area).filter_by(code=code).first()
+
         if not area:
             area = Knowledge_area(name=name, code=code)
             self.session.add(area)
@@ -32,8 +33,13 @@ class DatabaseMapper():
 
         if not speciality:
 
+            '''
+            If we haven't data about contract rating past year
+            we set default 110 bcs when we will calculate chances
+            we will deduct 10
+            '''
             if not spec.get('contract'):
-                spec['contract'] = 110
+                spec['contract'] = 110 
 
             speciality = Speciality(name=spec['name'], area=area,
                                     program=spec['program'],
@@ -47,6 +53,7 @@ class DatabaseMapper():
         speciality = self.session.query(
             Speciality).filter_by(name=spec['name']).first()
 
+        #Write every coefficient from list to database
         for zno in znos:
             zno_subj = self.session.query(
                 Zno_subj).filter_by(name=zno['name']).first()
@@ -67,7 +74,9 @@ class DatabaseMapper():
 
             self.session.commit()
 
+    
     def create_user(self, tg_id):
+        ''' Create user if doesn't exist '''
 
         user = self.session.query(Users).filter_by(tg_id=tg_id).first()
 
@@ -92,6 +101,7 @@ class DatabaseMapper():
 
         if not grade:
 
+            #check availability of grade at the user
             if data['grade'] != 0:
                 grade = Grades(owner=user, grade=data['grade'], zno=zno)
                 self.session.add(grade)
@@ -133,6 +143,9 @@ class DatabaseMapper():
     def grades_for_spec(self, tgid, spec=None, area=None):
 
         user = self.session.query(Users).filter_by(tg_id=tgid).first()
+
+        #check mode from obtained data
+        #if bot sent spec we will check for only 1 speciality
         if spec:
             speciality = self.session.query(Speciality).filter(
                 Speciality.name.startswith(spec)).first()
@@ -143,6 +156,8 @@ class DatabaseMapper():
             if grade >= speciality.min_rate_budget:
 
                 return 'Вiтаємо! Ви можете поступити на бюджет'
+
+            # We have only avg contract score, so minimum can be 10 less.
             if grade >= (speciality.min_rate_pay - 10):
 
                 return 'Вiтаємо! Ви можете поступити за контрактом'
@@ -150,6 +165,7 @@ class DatabaseMapper():
 
                 return 'Нажаль ви не можете поступити за цiєю спецiальнiстю'
 
+        #if bot sent area we will check for all specialities in area
         else:
             area = self.session.query(Knowledge_area).filter(
                 Knowledge_area.name.startswith(area)).first()
@@ -160,30 +176,34 @@ class DatabaseMapper():
 
                 coefs = self.session.query(Coefficient).filter_by(
                     speciality=spec)  # getting coefs by query bcs another case we're getting Instrumentallist
-                grade = self.checking(user, coefs)
+                grade = self.checking(user, coefs)  # get user grades
 
                 if grade >= spec.min_rate_budget:
                     budget.append(spec.name)
+
+                # We have only avg contract score, so minimum can be 10 less.
                 if grade >= (spec.min_rate_pay - 10):
                     contract.append(spec.name)
 
             return {'budget': budget, 'contract': contract}
 
+    def checking(self, user, coefs):
         '''crutch but idk how to do it another way('''
 
-    def checking(self, user, coefs):
-
-        req_cfs = coefs.filter_by(required=True).all()
-        not_req = coefs.filter_by(required=False).all()
-        grade = 0
+        req_cfs = coefs.filter_by(required=True).all()  # Getting required ZNO
+        not_req = coefs.filter_by(required=False).all()  # Not required
+        grade = 0  # start point
+        # Checking availability required grade for user.
         for req in req_cfs:
             user_grade = self.session.query(Grades).filter_by(
                 zno=req.zno, owner=user).first()
             if user_grade:
+                # getting sum of required grades
                 grade = grade + user_grade.grade * req.coefficient
             else:
                 return 0
 
+        ''' Getting maximum grade from additional znos '''
         max_third = 0
         for unreq in not_req:
             user_grade = self.session.query(Grades).filter_by(
@@ -195,6 +215,8 @@ class DatabaseMapper():
         if max_third == 0:
             return 0
 
-        grade = grade + max_third * not_req[0].coefficient
+        #sum of scores of 2 required and third zno multiply for coefficients
+        #1.02 - regional coefficient for the major part of cities in UA 
+        grade = (grade + max_third * not_req[0].coefficient)*1.02
 
         return grade

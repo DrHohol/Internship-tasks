@@ -12,10 +12,10 @@ from time import sleep
 db = DatabaseMapper()
 
 key = json.load(open('config.json'))['key']
-print(key)
 bot = Bot(token=key)
 
 dp = Dispatcher(bot, storage=MemoryStorage())
+
 
 ''' For menu '''
 
@@ -65,7 +65,8 @@ async def set_zno_grade(callback_query: types.CallbackQuery, state: FSMContext):
     await Grades.grade.set()
     await callback_query.answer()
     await callback_query.message.answer(f'Введiть балл з: {subject}\nДля видалення введiть 0',
-                                        reply_markup=types.ReplyKeyboardMarkup(resize_keyboard=True).add(types.KeyboardButton('Назад')))
+                                        reply_markup=types.ReplyKeyboardMarkup(
+                                            resize_keyboard=True).add(types.KeyboardButton('Назад')))
 
 ''' setting grade and finish state '''
 
@@ -74,6 +75,7 @@ async def set_zno_grade(callback_query: types.CallbackQuery, state: FSMContext):
 async def math(message: types.Message, state: FSMContext):
 
     async with state.proxy() as data:
+        # validation for grade
         try:
             data['grade'] = float(message.text)
 
