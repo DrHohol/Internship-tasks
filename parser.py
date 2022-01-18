@@ -77,7 +77,6 @@ class Parser():
                 if td_list[0].text == 'Мінімальний рейтинговий бал серед зарахованих на бюджет':
                     spec['budget'] = td_list[1].text
                     break
-            print(spec)
             DatabaseMapper().add_speciality(spec)
             DatabaseMapper().write_coefficients(coefficients, spec)
 

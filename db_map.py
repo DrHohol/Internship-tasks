@@ -32,7 +32,7 @@ class DatabaseMapper():
             Speciality).filter_by(name=spec['name']).first()
 
         '''
-            If we haven't data about contract rating past year
+            If we haven't data about contract rating last year
             we set default 110 bcs when we will calculate chances
             we will deduct 10
         '''
@@ -142,15 +142,15 @@ class DatabaseMapper():
 
         areas = self.session.query(Knowledge_area).all()
 
-        return [str(area) for area in areas if area.specialities]
+        return [area for area in areas if area.specialities]
 
     def specs(self, areaz):
 
-        area = self.session.query(Knowledge_area).filter(
-            Knowledge_area.name.startswith(areaz)).first()
+        area = self.session.query(Knowledge_area).filter_by(
+            id=areaz).first()
         specs = self.session.query(Speciality).filter_by(area=area).all()
 
-        return [str(spec) for spec in specs]
+        return [spec for spec in specs]
 
     def grades_for_spec(self, tg_id, spec=None, area=None):
 
@@ -159,15 +159,15 @@ class DatabaseMapper():
         # check mode from obtained data
         # if bot sent spec we will check for only 1 speciality
         if spec:
-            speciality = self.session.query(Speciality).filter(
-                Speciality.name.startswith(spec)).first()
+            speciality = self.session.query(Speciality).filter_by(
+                id=spec).first()
             coefs = self.session.query(Coefficient).filter_by(
                 speciality=speciality)
             grade = self.checking(user, coefs)
 
             if grade >= speciality.min_rate_budget:
 
-                return 'Вiтаємо! Ви можете поступити на бюджет'
+                return 'Вiтаємо! Ви можете поступити за бюджетом'
 
             # We have only avg contract score, so minimum can be 10 less.
             if grade >= (speciality.min_rate_pay - 10):
@@ -179,8 +179,8 @@ class DatabaseMapper():
 
         # if bot sent area we will check for all specialities in area
         else:
-            area = self.session.query(Knowledge_area).filter(
-                Knowledge_area.name.startswith(area)).first()
+            area = self.session.query(Knowledge_area).filter_by(
+                id=area).first()
             specs = area.specialities
             budget = []
             contract = []
@@ -205,7 +205,7 @@ class DatabaseMapper():
         req_cfs = coefs.filter_by(required=True).all()  # Getting required ZNO
         not_req = coefs.filter_by(required=False).all()  # Not required
         grade = 0  # start point
-        # Checking availability required grade for user.
+        # Checking availability of required grade for user.
         for req in req_cfs:
             user_grade = self.session.query(Grades).filter_by(
                 zno=req.zno, owner=user).first()

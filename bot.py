@@ -43,7 +43,7 @@ async def get_grades(message: types.Message):
                                reply_markup=Buttons.select_zno)
 
 
-@dp.message_handler(Text(equals='Мои бали', ignore_case=True), state='*')
+@dp.message_handler(Text(equals='Мої бали', ignore_case=True), state='*')
 async def get_grades(message: types.Message):
     grades = '\n'.join(db.get_grades(message.from_user.id))
     if not grades:
@@ -117,7 +117,7 @@ async def choose_spec(callback_query: types.CallbackQuery, state: FSMContext):
     if callback_query.data == 'all':
         async with state.proxy() as data:
             abilities = db.grades_for_spec(
-                tgid=callback_query.from_user.id, area=data['area'])
+                tg_id=callback_query.from_user.id, area=data['area'])
         if abilities['budget'] or abilities['contract']:
             nl = '\n'
             message = f'''*Ви можете поступити на бюджет:*\n{nl.join(
@@ -131,7 +131,7 @@ async def choose_spec(callback_query: types.CallbackQuery, state: FSMContext):
         await Grades.choose_area.set()
     else:
         await callback_query.message.answer(db.grades_for_spec(
-            tgid=callback_query.from_user.id, spec=callback_query.data))
+            tg_id=callback_query.from_user.id, spec=callback_query.data))
     await callback_query.answer()
 
 if __name__ == '__main__':
