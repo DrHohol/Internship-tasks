@@ -23,7 +23,7 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 @dp.message_handler(commands=['help', 'start'], state='*')
 async def hello(message: types.Message):
     await message.answer('''
-        Привiт! Цей бот допоможе вам дiзнатись ви можете поступити!''',
+        Привiт! Цей бот допоможе вам дiзнатись куди ви можете поступити!''',
                          reply_markup=Keyboard.home)
     db.create_user(message.from_user.id)
 

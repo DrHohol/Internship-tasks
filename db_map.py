@@ -31,21 +31,30 @@ class DatabaseMapper():
         speciality = self.session.query(
             Speciality).filter_by(name=spec['name']).first()
 
-        if not speciality:
-
-            '''
+        '''
             If we haven't data about contract rating past year
             we set default 110 bcs when we will calculate chances
             we will deduct 10
-            '''
-            if not spec.get('contract'):
-                spec['contract'] = 110 
+        '''
+        if not spec.get('contract'):
+            spec['contract'] = 110
 
+        if not speciality:
+
+            if not spec.get('budget'):  # Some specialities have only contract form
+                spec['budget'] = 201
             speciality = Speciality(name=spec['name'], area=area,
                                     program=spec['program'],
                                     min_rate_budget=spec['budget'],
                                     min_rate_pay=spec['contract'])
-        self.session.add(speciality)
+            self.session.add(speciality)
+        else:
+            if not spec.get('budget'):
+                # If speciality have also only contract form
+                # we will set budget rate from contract/budget form
+                spec['budget'] = speciality.min_rate_budget
+            speciality.min_rate_budget = spec['budget']
+            speciality.min_rate_pay = spec['contract']
         self.session.commit()
 
     def write_coefficients(self, znos, spec):
@@ -53,7 +62,7 @@ class DatabaseMapper():
         speciality = self.session.query(
             Speciality).filter_by(name=spec['name']).first()
 
-        #Write every coefficient from list to database
+        # Write every coefficient from list to database
         for zno in znos:
             zno_subj = self.session.query(
                 Zno_subj).filter_by(name=zno['name']).first()
@@ -72,9 +81,12 @@ class DatabaseMapper():
                                    required=zno['required'])
                 self.session.add(coef)
 
+            else:
+                if coef.coefficient != float(zno['coefficient']):
+                    coef.coefficient = zno['coefficient']
+
             self.session.commit()
 
-    
     def create_user(self, tg_id):
         ''' Create user if doesn't exist '''
 
@@ -101,7 +113,7 @@ class DatabaseMapper():
 
         if not grade:
 
-            #check availability of grade at the user
+            # check availability of grade at the user
             if data['grade'] != 0:
                 grade = Grades(owner=user, grade=data['grade'], zno=zno)
                 self.session.add(grade)
@@ -140,12 +152,12 @@ class DatabaseMapper():
 
         return [str(spec) for spec in specs]
 
-    def grades_for_spec(self, tgid, spec=None, area=None):
+    def grades_for_spec(self, tg_id, spec=None, area=None):
 
-        user = self.session.query(Users).filter_by(tg_id=tgid).first()
+        user = self.session.query(Users).filter_by(tg_id=tg_id).first()
 
-        #check mode from obtained data
-        #if bot sent spec we will check for only 1 speciality
+        # check mode from obtained data
+        # if bot sent spec we will check for only 1 speciality
         if spec:
             speciality = self.session.query(Speciality).filter(
                 Speciality.name.startswith(spec)).first()
@@ -165,7 +177,7 @@ class DatabaseMapper():
 
                 return 'Нажаль ви не можете поступити за цiєю спецiальнiстю'
 
-        #if bot sent area we will check for all specialities in area
+        # if bot sent area we will check for all specialities in area
         else:
             area = self.session.query(Knowledge_area).filter(
                 Knowledge_area.name.startswith(area)).first()
@@ -215,8 +227,8 @@ class DatabaseMapper():
         if max_third == 0:
             return 0
 
-        #sum of scores of 2 required and third zno multiply for coefficients
-        #1.02 - regional coefficient for the major part of cities in UA 
-        grade = (grade + max_third * not_req[0].coefficient)*1.02
+        # sum of scores of 2 required and third zno multiply for coefficients
+        # 1.02 - regional coefficient for the major part of cities in UA
+        grade = (grade + max_third * not_req[0].coefficient) * 1.02
 
         return grade

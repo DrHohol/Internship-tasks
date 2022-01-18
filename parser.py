@@ -7,11 +7,12 @@ import re
 host = 'https://vstup.osvita.ua'
 
 
-class Parser(DatabaseMapper):
+class Parser():
 
     @staticmethod
     def get_areas():
 
+        # start link -- link with selected university and level degree
         start_link = 'https://vstup.osvita.ua/spec/1-40-1/0-0-0-104-0-0/'
         result = requests.get(start_link).text
         soup = bs(result, 'html.parser')
@@ -29,6 +30,7 @@ class Parser(DatabaseMapper):
 
     @staticmethod
     def courses_ln_gen(courses):
+        '''Generate link for each course '''
 
         course_links = []
         for link in courses:
@@ -54,11 +56,11 @@ class Parser(DatabaseMapper):
                 'div', class_='page-vnz-detail-title').find('h1').findAll('b')[1].text
             spec['program'] = soup.find(
                 'div', class_='page-vnz-detail-title').find('h1').findAll('b')[0].text
-            coefficients = Parser.get_coefficients(soup)
+            coefficients = Parser.get_coefficients(soup) #get coefficients
             try:
                 linkfordetails = soup.findAll(
                     'table', class_="stats-vnz-table")[0].find('a')
-            except (KeyError,ValueError,IndexError):
+            except (KeyError, ValueError, IndexError):
                 continue
 
             links_f_details = f"{host}{linkfordetails.get('href')}"
@@ -75,6 +77,7 @@ class Parser(DatabaseMapper):
                 if td_list[0].text == 'Мінімальний рейтинговий бал серед зарахованих на бюджет':
                     spec['budget'] = td_list[1].text
                     break
+            print(spec)
             DatabaseMapper().add_speciality(spec)
             DatabaseMapper().write_coefficients(coefficients, spec)
 
@@ -84,21 +87,21 @@ class Parser(DatabaseMapper):
         znos = []
         first = soup.find('li', class_='subject_1')
         znos.append({'name': first.find('b').text, 'coefficient': first.find(
-            'span', class_='coef').text, 'required': True})
+            'span', class_='coef').text, 'required': True}) #find and append 1st zno coef
         second = soup.find('li', class_='subject_2')
         znos.append({'name': second.find('b').text, 'coefficient': second.find(
-            'span', class_='coef').text, 'required': True})
-        tb = soup.find('li', class_='subject_3')
+            'span', class_='coef').text, 'required': True}) #Find and append 2nd zno coef
+        tb = soup.find('li', class_='subject_3') #find tag with variants of 3rd subject
         third = tb.findAll('div', class_=re.compile(r'sub_\d+'))
 
-        for subject in third:
+        for subject in third:  # find every subject with third priority
             znos.append({'name': subject.find('b').text,
                          'coefficient': subject.find('span', class_='coef').text,
                          'required': False})
 
         attestat = soup.find('li', class_='subject_100')
         znos.append({'name': attestat.find('b').text, 'coefficient': attestat.find(
-            'span', class_='coef').text, 'required': True})
+            'span', class_='coef').text, 'required': True})  #add attestad coefficient
 
         return znos
 
